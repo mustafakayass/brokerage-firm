@@ -161,8 +161,9 @@ Note: (userId designed only for admin, If the user enters a value other than the
 ---
 
 ## Notes
--runs at 8080 port.
--H2 url: http://localhost:8080/h2-console
--h2 credentials located in yml
----
+
+- The application runs on port **8080**.
+- H2 database console URL: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
+- H2 credentials are located in the `application.yml` file.
+
 
