@@ -1,8 +1,8 @@
 package com.kayas.brokerageFirm.service;
 
-import com.kayas.brokerageFirm.dto.response.AdminValidationResponse;
 import com.kayas.brokerageFirm.dto.request.OrderDeleteRequest;
 import com.kayas.brokerageFirm.dto.request.OrderRequest;
+import com.kayas.brokerageFirm.dto.response.AdminValidationResponse;
 import com.kayas.brokerageFirm.entity.Asset;
 import com.kayas.brokerageFirm.entity.Order;
 import com.kayas.brokerageFirm.entity.User;
@@ -12,10 +12,10 @@ import com.kayas.brokerageFirm.service.helper.OrderHelper;
 import com.kayas.brokerageFirm.utility.enums.OrderSide;
 import com.kayas.brokerageFirm.utility.enums.Status;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,13 +25,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    @Autowired
-    private AssetService assetService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private OrderHelper orderHelper;
-
+    private final AssetService assetService;
+    private final UserService userService;
+    private final OrderHelper orderHelper;
 
     @Override
     public List<Order> getOrdersByFilters(Long userId, LocalDate startDate, LocalDate endDate) {
@@ -52,8 +48,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String createOrder(OrderRequest request) {
         final AdminValidationResponse response = userService.validateUserAccess(request.getUserId());
-        Double requestedOrderAmount = request.getSize() * request.getPrice();
-        
+        BigDecimal requestedOrderAmount = request.getSize().multiply(request.getPrice());
+
         if (OrderSide.BUY.getDisplayName().equals(request.getOrderSide())) {
             handleBuyOrder(response.getId(), requestedOrderAmount);
         } else {
@@ -68,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
     public String deleteOrder(OrderDeleteRequest request) {
         AdminValidationResponse response = userService.validateUserAccess(request.getUserId());
         Order order = orderHelper.getOrderById(request.getOrderId());
-        
+
         if (!response.isAdmin() && !order.getUserId().equals(response.getId())) {
             throw new UnauthorizedAccessException("You can only cancel your own orders.");
         }
@@ -86,25 +82,25 @@ public class OrderServiceImpl implements OrderService {
         return "Order with ID " + order.getId() + " has been cancelled.";
     }
 
-    private void handleBuyOrder(Long userId, Double requestedOrderAmount) {
+    private void handleBuyOrder(Long userId, BigDecimal requestedOrderAmount) {
         Asset tryAsset = assetService.getAssetByUserIdAndName(userId, "TRY");
         assetService.validateBuyOrder(tryAsset, requestedOrderAmount);
-        assetService.updateAssetSize(tryAsset, -requestedOrderAmount);
+        assetService.updateAssetSize(tryAsset, requestedOrderAmount.negate());
     }
 
-    private void handleSellOrder(Long userId, String assetName, Double requestedSize) {
+    private void handleSellOrder(Long userId, String assetName, BigDecimal requestedSize) {
         Asset requestedAsset = assetService.getAssetByUserIdAndName(userId, assetName);
         assetService.validateSellOrder(requestedAsset, requestedSize);
-        assetService.updateAssetSize(requestedAsset, -requestedSize);
+        assetService.updateAssetSize(requestedAsset, requestedSize.negate());
     }
 
-    private void handleBuyOrderCancellation(Long userId, Double size, Double price) {
+    private void handleBuyOrderCancellation(Long userId, BigDecimal size, BigDecimal price) {
         Asset tryAsset = assetService.getAssetByUserIdAndName(userId, "TRY");
-        Double refundAmount = size * price;
+        BigDecimal refundAmount = size.multiply(price);
         assetService.updateAssetSize(tryAsset, refundAmount);
     }
 
-    private void handleSellOrderCancellation(Long userId, String assetName, Double size) {
+    private void handleSellOrderCancellation(Long userId, String assetName, BigDecimal size) {
         Asset requestedAsset = assetService.getAssetByUserIdAndName(userId, assetName);
         assetService.updateAssetSize(requestedAsset, size);
     }

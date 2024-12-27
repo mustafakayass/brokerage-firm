@@ -2,6 +2,7 @@ package com.kayas.brokerageFirm.service;
 
 import com.kayas.brokerageFirm.entity.Asset;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface AssetService {
@@ -10,13 +11,15 @@ public interface AssetService {
 
     Asset getAssetByUserIdAndName(Long userId, String assetName);
 
-    void updateAssetSize(Asset asset, Double sizeChange);
+    Asset getOrCreateAsset(Long userId, String assetName);
 
-    void updateAssetSize(Asset asset, Double sizeChange, Double usableSizeChange);
+    void updateAssetSize(Asset asset, BigDecimal sizeChange);
 
-    void validateBuyOrder(Asset tryAsset, Double requestedOrderAmount);
+    void updateAssetSize(Asset asset, BigDecimal sizeChange, BigDecimal usableSizeChange);
 
-    void validateSellOrder(Asset requestedAsset, Double requestedSize);
+    void validateBuyOrder(Asset tryAsset, BigDecimal requestedOrderAmount);
 
+    void validateSellOrder(Asset requestedAsset, BigDecimal requestedSize);
+
+    Asset saveAsset(Asset asset);
 }
-

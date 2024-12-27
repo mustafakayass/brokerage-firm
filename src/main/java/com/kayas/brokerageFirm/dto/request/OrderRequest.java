@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 public class OrderRequest {
@@ -25,9 +27,9 @@ public class OrderRequest {
 
     @Positive(message = "Order size must be greater than zero.")
     @NotNull(message = "size field cannot be null.")
-    private Double size;
+    private BigDecimal size;
 
     @Positive(message = "price field must be greater than zero.")
     @NotNull(message = "price field cannot be null.")
-    private Double price;
+    private BigDecimal price;
 }

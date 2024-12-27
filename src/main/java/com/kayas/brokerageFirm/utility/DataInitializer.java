@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Component
@@ -35,18 +36,18 @@ public class DataInitializer implements CommandLineRunner {
 
     private void initializeAssets() {
         if (assetRepository.count() == 0) {
-            assetRepository.save(new Asset(1L, "BTC", 1.00, 1.00));
-            assetRepository.save(new Asset(1L, "TRY", 100000.00, 10000.00));
-            assetRepository.save(new Asset(1L, "USD", 10000.00, 10000.00));
-            assetRepository.save(new Asset(1L, "XAU", 100.00, 100.00));
-            assetRepository.save(new Asset(2L, "TRY", 100000.00, 100000.00));
-            assetRepository.save(new Asset(2L, "USD", 1000.00, 1000.00));
+            assetRepository.save(new Asset(1L, "BTC", BigDecimal.valueOf(1.0), BigDecimal.valueOf(1.0)));
+            assetRepository.save(new Asset(1L, "TRY", BigDecimal.valueOf(100000.0), BigDecimal.valueOf(100000.0)));
+            assetRepository.save(new Asset(1L, "USD", BigDecimal.valueOf(10000.0), BigDecimal.valueOf(10000.0)));
+            assetRepository.save(new Asset(1L, "XAU", BigDecimal.valueOf(100.0), BigDecimal.valueOf(100.0)));
+            assetRepository.save(new Asset(2L, "TRY", BigDecimal.valueOf(100000.0), BigDecimal.valueOf(100000.0)));
+            assetRepository.save(new Asset(2L, "USD", BigDecimal.valueOf(1000.0), BigDecimal.valueOf(1000.0)));
         }
     }
 
     private void initializeOrders() {
         if (orderRepository.count() == 0) {
-            orderRepository.save(new Order(1L, "BTC", "B", 2.00, 78500.00, "M",new Date()));
+            orderRepository.save(new Order(1L, "BTC", "B", BigDecimal.valueOf(2.0), BigDecimal.valueOf(78500.0), "M",new Date()));
         }
     }
 }

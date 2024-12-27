@@ -1,10 +1,11 @@
 package com.kayas.brokerageFirm.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "`ASSET`")
@@ -22,12 +23,12 @@ public class Asset {
     private String assetName;
 
     @Getter @Setter
-    private Double size;
+    private BigDecimal size;
 
     @Getter @Setter
-    private Double usableSize;
+    private BigDecimal usableSize;
 
-    public Asset(Long userId, String assetName, Double size, Double usableSize) {
+    public Asset(Long userId, String assetName, BigDecimal size, BigDecimal usableSize) {
         this.userId = userId;
         this.assetName = assetName;
         this.size = size;

@@ -5,17 +5,17 @@ import com.kayas.brokerageFirm.dto.request.DepositRequest;
 import com.kayas.brokerageFirm.dto.request.WithdrawalRequest;
 import com.kayas.brokerageFirm.dto.response.AdminValidationResponse;
 import com.kayas.brokerageFirm.entity.Asset;
-import com.kayas.brokerageFirm.entity.User;
-import com.kayas.brokerageFirm.exception.InsufficientAssetException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WalletServiceImplTest {
@@ -34,12 +34,12 @@ class WalletServiceImplTest {
         // Arrange
         DepositRequest request = new DepositRequest();
         request.setUserId(1L);
-        request.setAmount(1000.0);
+        request.setAmount(BigDecimal.valueOf(1000.0));
 
         AdminValidationResponse validationResponse = new AdminValidationResponse();
         validationResponse.setId(1L);
 
-        Asset tryAsset = new Asset(1L, "TRY", 1000.0, 1000.0);
+        Asset tryAsset = new Asset(1L, "TRY", BigDecimal.valueOf(1000.0), BigDecimal.valueOf(1000.0));
 
         // Stub: AdminValidationResponse dön
         when(userService.validateUserAccess(request.getUserId())).thenReturn(validationResponse);
@@ -65,13 +65,13 @@ class WalletServiceImplTest {
         // Arrange
         WithdrawalRequest request = new WithdrawalRequest();
         request.setUserId(1L);
-        request.setAmount(500.0);
+        request.setAmount(BigDecimal.valueOf(500.0));
         request.setIban("TR123456789012345678901234");
 
         AdminValidationResponse validationResponse = new AdminValidationResponse();
         validationResponse.setId(1L);
 
-        Asset tryAsset = new Asset(1L, "TRY", 1000.0, 1000.0);
+        Asset tryAsset = new Asset(1L, "TRY", BigDecimal.valueOf(1000.0), BigDecimal.valueOf(1000.0));
 
         // Stub: AdminValidationResponse dön
         when(userService.validateUserAccess(request.getUserId())).thenReturn(validationResponse);
@@ -87,7 +87,7 @@ class WalletServiceImplTest {
         verify(assetService).validateBuyOrder(tryAsset, request.getAmount());
 
         // assetService.updateAssetSize metodu doğru parametrelerle çağrılmış mı kontrol et
-        verify(assetService).updateAssetSize(tryAsset, -request.getAmount(), -request.getAmount());
+        verify(assetService).updateAssetSize(tryAsset, request.getAmount().negate(), request.getAmount().negate());
 
         // Sonucun başarılı olduğunu doğrula
         assertTrue(result.contains("Withdrawal success: 500.0 TRY, for IBAN: TR123456789012345678901234 has been created."));

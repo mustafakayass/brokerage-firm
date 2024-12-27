@@ -1,12 +1,11 @@
 package com.kayas.brokerageFirm.service;
 
-import com.kayas.brokerageFirm.dto.response.AdminValidationResponse;
 import com.kayas.brokerageFirm.dto.request.DepositRequest;
 import com.kayas.brokerageFirm.dto.request.WithdrawalRequest;
+import com.kayas.brokerageFirm.dto.response.AdminValidationResponse;
 import com.kayas.brokerageFirm.entity.Asset;
 import com.kayas.brokerageFirm.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,10 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WalletServiceImpl implements WalletService {
 
-    @Autowired
-    private AssetService assetService;
-    @Autowired
-    private UserService userService;
+    private final AssetService assetService;
+    private final UserService userService;
 
     @Override
     public List<Asset> listAssets(Long userId) {
@@ -49,7 +46,7 @@ public class WalletServiceImpl implements WalletService {
         AdminValidationResponse response = userService.validateUserAccess(request.getUserId());
         Asset asset = assetService.getAssetByUserIdAndName(response.getId(), "TRY");
         assetService.validateBuyOrder(asset, request.getAmount());
-        assetService.updateAssetSize(asset, -request.getAmount(), -request.getAmount());
+        assetService.updateAssetSize(asset, request.getAmount().negate(), request.getAmount().negate());
         
         return "Withdrawal success: " + request.getAmount() + " TRY, for IBAN: " + request.getIban() + " has been created.";
     }

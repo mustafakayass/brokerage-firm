@@ -1,9 +1,3 @@
-package com.kayas.brokerageFirm.dto.request;
+package com.kayas.brokerageFirm.dto.request
 
-import lombok.Data;
-
-@Data
-public class LoginRequest {
-    private String username;
-    private String password;
-}
+data class LoginRequest(val username: String, val password: String)

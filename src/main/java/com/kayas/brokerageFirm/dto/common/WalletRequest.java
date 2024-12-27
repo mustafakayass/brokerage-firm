@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class WalletRequest {
 
@@ -13,5 +15,5 @@ public class WalletRequest {
 
     @NotNull(message = "Amount field cannot be null.")
     @Positive(message = "Amount must be greater than zero.")
-    private Double amount;
+    private BigDecimal amount;
 }

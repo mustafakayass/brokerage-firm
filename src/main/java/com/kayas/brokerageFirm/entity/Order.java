@@ -1,11 +1,11 @@
 package com.kayas.brokerageFirm.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -25,10 +25,10 @@ public class Order {
     private String assetName;
 
     @Setter
-    private Double size;
+    private BigDecimal size;
 
     @Setter
-    private Double price;
+    private BigDecimal price;
 
     @Setter
     private String status;
@@ -39,7 +39,7 @@ public class Order {
     @Setter
     private Date createDate;
 
-    public Order(Long userId, String assetName, String orderSide, Double size, Double price, String status, Date createDate) {
+    public Order(Long userId, String assetName, String orderSide, BigDecimal size, BigDecimal price, String status, Date createDate) {
         this.userId = userId;
         this.assetName = assetName;
         this.orderSide = orderSide;

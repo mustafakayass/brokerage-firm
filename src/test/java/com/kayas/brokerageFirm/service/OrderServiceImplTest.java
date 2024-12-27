@@ -1,11 +1,10 @@
 package com.kayas.brokerageFirm.service;
 
-import com.kayas.brokerageFirm.dto.response.AdminValidationResponse;
 import com.kayas.brokerageFirm.dto.request.OrderDeleteRequest;
 import com.kayas.brokerageFirm.dto.request.OrderRequest;
+import com.kayas.brokerageFirm.dto.response.AdminValidationResponse;
 import com.kayas.brokerageFirm.entity.Asset;
 import com.kayas.brokerageFirm.entity.Order;
-import com.kayas.brokerageFirm.entity.User;
 import com.kayas.brokerageFirm.exception.InvalidOrderStatusException;
 import com.kayas.brokerageFirm.exception.UnauthorizedAccessException;
 import com.kayas.brokerageFirm.service.helper.OrderHelper;
@@ -16,9 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -42,16 +43,16 @@ class OrderServiceImplTest {
         // Arrange
         OrderRequest request = new OrderRequest();
         request.setOrderSide("B");
-        request.setSize(1.0);
-        request.setPrice(50000.0);
+        request.setSize(BigDecimal.valueOf(1.0));
+        request.setPrice(BigDecimal.valueOf(50000.0));
         request.setAssetName("BTC");
         
         AdminValidationResponse validationResponse = new AdminValidationResponse();
         validationResponse.setId(1L);
         validationResponse.setAdmin(false);
         
-        Asset tryAsset = new Asset(1L, "TRY", 100000.0, 100000.0);
-        Order createdOrder = new Order(1L, "BTC", "B", 1.0, 50000.0, "P", new Date());
+        Asset tryAsset = new Asset(1L, "TRY", BigDecimal.valueOf(100000.0), BigDecimal.valueOf(100000.0));
+        Order createdOrder = new Order(1L, "BTC", "B", BigDecimal.valueOf(1.0), BigDecimal.valueOf(50000.0), "P", new Date());
         
         when(userService.validateUserAccess(any())).thenReturn(validationResponse);
         when(assetService.getAssetByUserIdAndName(1L, "TRY")).thenReturn(tryAsset);
@@ -61,8 +62,8 @@ class OrderServiceImplTest {
         String result = orderService.createOrder(request);
         
         // Assert
-        verify(assetService).validateBuyOrder(tryAsset, 50000.0);
-        verify(assetService).updateAssetSize(tryAsset, -50000.0);
+        verify(assetService).validateBuyOrder(tryAsset, BigDecimal.valueOf(50000.0));
+        verify(assetService).updateAssetSize(tryAsset, BigDecimal.valueOf(-50000.0));
         assertTrue(result.contains("has been created"));
     }
 
@@ -71,15 +72,15 @@ class OrderServiceImplTest {
         // Arrange
         OrderRequest request = new OrderRequest();
         request.setOrderSide("S");
-        request.setSize(1.0);
-        request.setPrice(50000.0);
+        request.setSize(BigDecimal.valueOf(1.0));
+        request.setPrice(BigDecimal.valueOf(50000.0));
         request.setAssetName("BTC");
         
         AdminValidationResponse validationResponse = new AdminValidationResponse();
         validationResponse.setId(1L);
         
-        Asset btcAsset = new Asset(1L, "BTC", 2.0, 2.0);
-        Order createdOrder = new Order(1L, "BTC", "S", 1.0, 50000.0, "P", new Date());
+        Asset btcAsset = new Asset(1L, "BTC", BigDecimal.valueOf(2.0), BigDecimal.valueOf(2.0));
+        Order createdOrder = new Order(1L, "BTC", "S", BigDecimal.valueOf(1.0), BigDecimal.valueOf(50000.0), "P", new Date());
         
         when(userService.validateUserAccess(any())).thenReturn(validationResponse);
         when(assetService.getAssetByUserIdAndName(1L, "BTC")).thenReturn(btcAsset);
@@ -89,8 +90,8 @@ class OrderServiceImplTest {
         String result = orderService.createOrder(request);
         
         // Assert
-        verify(assetService).validateSellOrder(btcAsset, 1.0);
-        verify(assetService).updateAssetSize(btcAsset, -1.0);
+        verify(assetService).validateSellOrder(btcAsset, BigDecimal.valueOf(1.0));
+        verify(assetService).updateAssetSize(btcAsset, BigDecimal.valueOf(1.0).negate());
         assertTrue(result.contains("has been created"));
     }
 
@@ -103,8 +104,8 @@ class OrderServiceImplTest {
         AdminValidationResponse validationResponse = new AdminValidationResponse();
         validationResponse.setId(1L);
         
-        Order pendingOrder = new Order(1L, "BTC", "B", 1.0, 50000.0, "P", new Date());
-        Asset tryAsset = new Asset(1L, "TRY", 100000.0, 100000.0);
+        Order pendingOrder = new Order(1L, "BTC", "B", BigDecimal.valueOf(1.0), BigDecimal.valueOf(50000.0), "P", new Date());
+        Asset tryAsset = new Asset(1L, "TRY", BigDecimal.valueOf(100000.0), BigDecimal.valueOf(100000.0));
         
         when(userService.validateUserAccess(any())).thenReturn(validationResponse);
         when(orderHelper.getOrderById(1L)).thenReturn(pendingOrder);
@@ -124,8 +125,8 @@ class OrderServiceImplTest {
         OrderRequest request = new OrderRequest();
         request.setUserId(2L); // Different user id than current user
         request.setOrderSide(OrderSide.BUY.getDisplayName());
-        request.setSize(10.0);
-        request.setPrice(100.0);
+        request.setSize(BigDecimal.valueOf(10.0));
+        request.setPrice(BigDecimal.valueOf(100.0));
 
         when(userService.validateUserAccess(request.getUserId()))
                 .thenThrow(new UnauthorizedAccessException("You can only access your own resources"));
